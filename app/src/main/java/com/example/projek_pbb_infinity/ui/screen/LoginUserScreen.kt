@@ -28,89 +28,76 @@ fun LoginUserScreen(
             .background(Color(0xFFF3E3D0))
     ) {
 
+        // TITLE
         Text(
-            text = "INFINITY",
+            text = "INKFINITY",
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 80.dp),
+                .padding(top = 100.dp),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = Color.DarkGray
         )
 
-        Column(
+        // CIRCLE BACKGROUND
+        Box(
             modifier = Modifier
-                .align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .size(260.dp)
+                .align(Alignment.TopCenter)
+                .padding(top = 200.dp)
+                .background(Color(0xFFD5BFA6), shape = CircleShape)
+        )
+
+        // LOGO KUCING
+        Image(
+            painter = painterResource(id = R.drawable.logo_kucing),
+            contentDescription = "Logo Kucing",
+            modifier = Modifier
+                .size(180.dp)
+                .align(Alignment.TopCenter)
+                .padding(top = 220.dp),
+            contentScale = ContentScale.Fit
+        )
+
+        // BUTTON LOGIN
+        Button(
+            onClick = onLoginClick,
+            modifier = Modifier
+                .width(220.dp)
+                .height(60.dp)
+                .align(Alignment.TopCenter)
+                .padding(top = 500.dp),
+            shape = RoundedCornerShape(15.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF81A6C6),
+                contentColor = Color.White
+            )
         ) {
-
-            Box(
-                modifier = Modifier.size(200.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(Color(0xFFD5BFA6), shape = CircleShape)
-                )
-
-                Image(
-                    painter = painterResource(id = R.drawable.mascot),
-                    contentDescription = "Mascot",
-                    modifier = Modifier.size(140.dp),
-                    contentScale = ContentScale.Fit
-                )
-            }
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            Button(
-                onClick = onLoginClick,
-                modifier = Modifier
-                    .width(160.dp)
-                    .height(50.dp),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81A6C6))
-            ) {
-                Text("Log In")
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Button(
-                onClick = onSignUpClick,
-                modifier = Modifier
-                    .width(160.dp)
-                    .height(45.dp),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81A6C6))
-            ) {
-                Text("Sign Up")
-            }
+            Text(
+                text = "Log In",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
 
-        Row(
+        // BUTTON SIGN UP
+        Button(
+            onClick = onSignUpClick,
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
+                .width(220.dp)
+                .height(60.dp)
+                .align(Alignment.TopCenter)
+                .padding(top = 580.dp),
+            shape = RoundedCornerShape(15.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF81A6C6),
+                contentColor = Color.White
+            )
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.pasta),
-                contentDescription = "Pasta",
-                modifier = Modifier.size(50.dp)
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.ken),
-                contentDescription = "Ken",
-                modifier = Modifier.size(60.dp)
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.min),
-                contentDescription = "Min",
-                modifier = Modifier.size(50.dp)
+            Text(
+                text = "Sign Up",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }
