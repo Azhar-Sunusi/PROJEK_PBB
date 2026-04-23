@@ -29,7 +29,7 @@ fun LoginUserScreen(
     ) {
 
         Text(
-            text = "INKFINITY",
+            text = "INFINITY",
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .padding(top = 80.dp),
