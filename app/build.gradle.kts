@@ -41,8 +41,11 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.material3:material3")
+    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
+    implementation("com.google.firebase:firebase-auth")
 
     implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation(libs.androidx.compose.foundation)
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 

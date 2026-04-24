@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "789280794686",
-    "project_id": "projek-72357",
-    "storage_bucket": "projek-72357.firebasestorage.app"
+    "project_number": "268831938364",
+    "project_id": "infinity-3199b",
+    "storage_bucket": "infinity-3199b.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:789280794686:android:231282dec34cecfc4f096f",
+        "mobilesdk_app_id": "1:268831938364:android:3c24d60df0f1616f2d3039",
         "android_client_info": {
           "package_name": "com.example.projek_pbb_infinity"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAWr-5VQjRrg8IodGd0rux8K7TF3LsCnHk"
+          "current_key": "AIzaSyDJ6I3YJ8oWt7fVrLvEZv_oGRoaWKiWUxw"
         }
       ],
       "services": {
