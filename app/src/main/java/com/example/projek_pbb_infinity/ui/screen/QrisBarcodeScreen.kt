@@ -21,9 +21,12 @@ import kotlinx.coroutines.delay
 @Composable
 fun QrisBarcodeScreen(
     onBackClick: () -> Unit,
-    onCheckStatusClick: () -> Unit
+    onCheckStatusClick: () -> Unit,
+    onLogoutClick: () -> Unit,
+    userName: String
 ) {
     var remainingSeconds by remember { mutableStateOf(23 * 60 + 59) }
+    var showMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         while (remainingSeconds > 0) {
@@ -36,73 +39,88 @@ fun QrisBarcodeScreen(
     val seconds = remainingSeconds % 60
     val timeText = "%02d:%02d".format(minutes, seconds)
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF3E3D0))
     ) {
-        HeaderPayment()
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = "Halaman Instruksi pembayaran",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold
+            HeaderPayment(userName = userName)
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Halaman Instruksi pembayaran",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .width(190.dp)
+                    .height(38.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .background(Color(0xFFFFE8C8), RoundedCornerShape(20.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "waktu tersisa :$timeText",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            Image(
+                painter = painterResource(R.drawable.qris_barcode),
+                contentDescription = "QRIS Barcode",
+                modifier = Modifier
+                    .size(265.dp)
+                    .align(Alignment.CenterHorizontally),
+                contentScale = ContentScale.Fit
+            )
+
+            Spacer(modifier = Modifier.height(22.dp))
+
+            Box(
+                modifier = Modifier
+                    .width(230.dp)
+                    .height(54.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .background(Color(0xFF8EB0CF), RoundedCornerShape(8.dp))
+                    .clickable { onCheckStatusClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Cek Status Pembayaran",
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            BottomPaymentBarWithMenu(
+                onBackClick = onBackClick,
+                onMenuClick = { showMenu = !showMenu }
             )
         }
 
-        Box(
-            modifier = Modifier
-                .width(190.dp)
-                .height(38.dp)
-                .align(Alignment.CenterHorizontally)
-                .background(Color(0xFFFFE8C8), RoundedCornerShape(20.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "waktu tersisa :$timeText",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(modifier = Modifier.height(18.dp))
-
-        Image(
-            painter = painterResource(R.drawable.qris_barcode),
-            contentDescription = "QRIS Barcode",
-            modifier = Modifier
-                .size(265.dp)
-                .align(Alignment.CenterHorizontally),
-            contentScale = ContentScale.Fit
+        BottomDropdownMenu(
+            showMenu = showMenu,
+            onLogoutClick = {
+                showMenu = false
+                onLogoutClick()
+            }
         )
-
-        Spacer(modifier = Modifier.height(22.dp))
-
-        Box(
-            modifier = Modifier
-                .width(230.dp)
-                .height(54.dp)
-                .align(Alignment.CenterHorizontally)
-                .background(Color(0xFF8EB0CF), RoundedCornerShape(8.dp))
-                .clickable { onCheckStatusClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Cek Status Pembayaran",
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        BottomPaymentBar(onBackClick = onBackClick)
     }
 }

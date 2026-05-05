@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projek_pbb_infinity.R
+import com.example.projek_pbb_infinity.ui.component.BottomMenuDropdown
 
 private val Cream = Color(0xFFF3E3D0)
 private val Blue = Color(0xFF8EB0CF)
@@ -28,148 +29,241 @@ fun MetodePembayaranScreen(
     serviceTitle: String,
     totalPayment: Int,
     onBackClick: () -> Unit,
-    onQrisPayClick: () -> Unit
+    onQrisPayClick: () -> Unit,
+    onLogoutClick: () -> Unit,
+    userName: String
 ) {
     var selectedPayment by remember { mutableStateOf("Tunai") }
+    var showMenu by remember { mutableStateOf(false) }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Cream)
     ) {
-        HeaderPayment()
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = "~Halaman Instruksi pembayaran~",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp)
-                .height(220.dp)
-                .background(Color.White, RoundedCornerShape(8.dp))
-                .padding(horizontal = 14.dp, vertical = 14.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(
-                    text = "metode pembayaran:",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                PaymentOption(
-                    icon = R.drawable.dollar_1,
-                    text = "Pembayaran Tunai",
-                    selected = selectedPayment == "Tunai",
-                    onClick = { selectedPayment = "Tunai" }
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                PaymentOption(
-                    icon = R.drawable.transfer_virtual_account,
-                    text = "Transfer Virtual Account",
-                    selected = selectedPayment == "VA",
-                    onClick = { selectedPayment = "VA" }
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                PaymentOption(
-                    icon = R.drawable.qris,
-                    text = "QRIS",
-                    selected = selectedPayment == "QRIS",
-                    onClick = { selectedPayment = "QRIS" }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 10.dp)
-                .height(100.dp)
-                .background(Color.White, RoundedCornerShape(10.dp))
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-        ) {
-            Column(
-                modifier = Modifier.align(Alignment.TopStart)
-            ) {
-                Text(
-                    text = "Total Pembayaran",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                    text = serviceTitle,
-                    fontSize = 12.sp,
-                    color = Color.Black
-                )
-            }
-
-            Text(
-                text = formatRupiah(totalPayment),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(end = 4.dp)
-            )
+            HeaderPayment(userName = userName)
 
             Box(
                 modifier = Modifier
-                    .width(160.dp)
-                    .height(48.dp)
-                    .align(Alignment.BottomCenter)
-                    .background(Blue, RoundedCornerShape(10.dp))
-                    .clickable {
-                        if (selectedPayment == "QRIS") {
-                            onQrisPayClick()
-                        }
-                    },
+                    .fillMaxWidth()
+                    .height(48.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Bayar Sekarang",
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "~Halaman Instruksi pembayaran~",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
                 )
             }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp)
+                    .height(220.dp)
+                    .background(Color.White, RoundedCornerShape(8.dp))
+                    .padding(horizontal = 14.dp, vertical = 14.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text(
+                        text = "metode pembayaran:",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    PaymentOption(
+                        icon = R.drawable.dollar_1,
+                        text = "Pembayaran Tunai",
+                        selected = selectedPayment == "Tunai",
+                        onClick = { selectedPayment = "Tunai" }
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    PaymentOption(
+                        icon = R.drawable.transfer_virtual_account,
+                        text = "Transfer Virtual Account",
+                        selected = selectedPayment == "VA",
+                        onClick = { selectedPayment = "VA" }
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    PaymentOption(
+                        icon = R.drawable.qris,
+                        text = "QRIS",
+                        selected = selectedPayment == "QRIS",
+                        onClick = { selectedPayment = "QRIS" }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp, vertical = 10.dp)
+                    .height(100.dp)
+                    .background(Color.White, RoundedCornerShape(10.dp))
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                Column(
+                    modifier = Modifier.align(Alignment.TopStart)
+                ) {
+                    Text(
+                        text = "Total Pembayaran",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = serviceTitle,
+                        fontSize = 12.sp,
+                        color = Color.Black
+                    )
+                }
+
+                Text(
+                    text = formatRupiah(totalPayment),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(end = 4.dp)
+                )
+
+                Box(
+                    modifier = Modifier
+                        .width(160.dp)
+                        .height(48.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(Blue, RoundedCornerShape(10.dp))
+                        .clickable {
+                            if (selectedPayment == "QRIS") {
+                                onQrisPayClick()
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Bayar Sekarang",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            BottomPaymentBarWithMenu(
+                onBackClick = onBackClick,
+                onMenuClick = {
+                    showMenu = !showMenu
+                }
+            )
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        BottomPaymentBar(onBackClick = onBackClick)
+        BottomDropdownMenu(
+            showMenu = showMenu,
+            onLogoutClick = {
+                showMenu = false
+                onLogoutClick()
+            }
+        )
     }
 }
 
 @Composable
-fun HeaderPayment() {
+fun BottomDropdownMenu(
+    showMenu: Boolean,
+    onLogoutClick: () -> Unit
+) {
+    BottomMenuDropdown(
+        showMenu = showMenu,
+        onRiwayatClick = {},
+        onLogoutClick = onLogoutClick
+    )
+}
+
+@Composable
+fun BottomPaymentBarWithMenu(
+    onBackClick: () -> Unit,
+    onMenuClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .background(Color.White)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .align(Alignment.CenterStart)
+                .offset(x = 12.dp)
+                .background(Color(0xFFB8DAE5), CircleShape)
+                .clickable { onBackClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(R.drawable.add_file_here2),
+                contentDescription = null,
+                modifier = Modifier.size(34.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .align(Alignment.Center)
+                .background(Color(0xFFB8DAE5), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(R.drawable.tombol_home),
+                contentDescription = null,
+                modifier = Modifier.size(36.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .size(52.dp)
+                .align(Alignment.CenterEnd)
+                .offset(x = (-12).dp)
+                .background(Color(0xFFB8DAE5), RoundedCornerShape(8.dp))
+                .clickable { onMenuClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(R.drawable.tombol_riwayat_transaksi),
+                contentDescription = null,
+                modifier = Modifier.size(30.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
+    }
+}
+@Composable
+fun HeaderPayment(userName: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -196,7 +290,7 @@ fun HeaderPayment() {
 
         Column {
             Text("Hai..!", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-            Text("Azhar", color = Color.White, fontSize = 17.sp)
+            Text(userName, color = Color.White, fontSize = 17.sp)
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -240,66 +334,6 @@ private fun PaymentOption(
             color = Color.Black,
             fontWeight = FontWeight.Bold
         )
-    }
-}
-
-@Composable
-fun BottomPaymentBar(
-    onBackClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .background(Color.White)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(56.dp)
-                .align(Alignment.CenterStart)
-                .offset(x = 12.dp)
-                .background(Color(0xFFB8DAE5), CircleShape)
-                .clickable { onBackClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(R.drawable.add_file_here2),
-                contentDescription = "Kembali",
-                modifier = Modifier.size(34.dp),
-                contentScale = ContentScale.Fit
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .size(56.dp)
-                .align(Alignment.Center)
-                .background(Color(0xFFB8DAE5), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(R.drawable.tombol_home),
-                contentDescription = null,
-                modifier = Modifier.size(36.dp),
-                contentScale = ContentScale.Fit
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .size(52.dp)
-                .align(Alignment.CenterEnd)
-                .offset(x = (-12).dp)
-                .background(Color(0xFFB8DAE5), RoundedCornerShape(8.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(R.drawable.tombol_riwayat_transaksi),
-                contentDescription = null,
-                modifier = Modifier.size(30.dp),
-                contentScale = ContentScale.Fit
-            )
-        }
     }
 }
 

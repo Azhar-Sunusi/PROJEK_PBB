@@ -124,6 +124,10 @@ class MainActivity : ComponentActivity() {
                             onNextClick = {
                                 selectedDetail = it
                                 currentScreen = Screen.DETAIL_PESANAN
+                            },
+                            onLogoutClick = {
+                                auth.signOut()
+                                currentScreen = Screen.LOGIN_FORM
                             }
                         )
                     }
@@ -131,12 +135,15 @@ class MainActivity : ComponentActivity() {
                     Screen.DETAIL_PESANAN -> {
                         DetailPesananScreen(
                             service = selectedDetail,
-                            onBackClick = {
-                                currentScreen = Screen.BERANDA_USER
-                            },
+                            onBackClick = { currentScreen = Screen.BERANDA_USER },
+                            userName = userName,
                             onContinueClick = { qty ->
                                 selectedQty = qty
                                 currentScreen = Screen.METODE_PEMBAYARAN
+                            },
+                            onLogoutClick = {
+                                auth.signOut()
+                                currentScreen = Screen.LOGIN_FORM
                             }
                         )
                     }
@@ -144,12 +151,17 @@ class MainActivity : ComponentActivity() {
                     Screen.METODE_PEMBAYARAN -> {
                         MetodePembayaranScreen(
                             serviceTitle = selectedDetail.title,
+                            userName = userName,
                             totalPayment = getHarga(selectedDetail.title) * selectedQty,
                             onBackClick = {
                                 currentScreen = Screen.DETAIL_PESANAN
                             },
                             onQrisPayClick = {
                                 currentScreen = Screen.QRIS_BARCODE
+                            },
+                            onLogoutClick = {
+                                auth.signOut()
+                                currentScreen = Screen.LOGIN_FORM
                             }
                         )
                     }
@@ -159,8 +171,13 @@ class MainActivity : ComponentActivity() {
                             onBackClick = {
                                 currentScreen = Screen.METODE_PEMBAYARAN
                             },
+                            userName = userName,
                             onCheckStatusClick = {
                                 currentScreen = Screen.PEMBAYARAN_BERHASIL
+                            },
+                            onLogoutClick = {
+                                auth.signOut()
+                                currentScreen = Screen.LOGIN_FORM
                             }
                         )
                     }
@@ -168,9 +185,14 @@ class MainActivity : ComponentActivity() {
                     Screen.PEMBAYARAN_BERHASIL -> {
                         PembayaranBerhasilScreen(
                             serviceTitle = selectedDetail.title,
+                            userName = userName,
                             totalPayment = getHarga(selectedDetail.title) * selectedQty,
                             onBackClick = {
                                 currentScreen = Screen.QRIS_BARCODE
+                            },
+                            onLogoutClick = {
+                                auth.signOut()
+                                currentScreen = Screen.LOGIN_FORM
                             }
                         )
                     }

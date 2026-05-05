@@ -58,9 +58,9 @@ fun LandingScreen(
                     painter = painterResource(id = R.drawable.logo_kucing4),
                     contentDescription = "Logo",
                     modifier = Modifier
-                        .fillMaxSize(0.7f)          // ⭐ ukuran pas
-                        .offset(x = (2).dp, y = (0).dp), // ⭐ geser kiri & naik biar center visual
-                    contentScale = ContentScale.Fit // ⭐ tidak kepotong
+                        .fillMaxSize(0.7f)
+                        .offset(x = (2).dp, y = (0).dp),
+                    contentScale = ContentScale.Fit
                 )
             }
 
