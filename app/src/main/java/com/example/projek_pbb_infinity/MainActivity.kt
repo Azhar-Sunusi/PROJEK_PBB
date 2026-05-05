@@ -9,6 +9,7 @@ import com.example.projek_pbb_infinity.ui.screen.*
 import com.example.projek_pbb_infinity.ui.theme.ProjekPbbInfinityTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.userProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 
 enum class Screen {
     LANDING,
@@ -24,11 +25,13 @@ enum class Screen {
 class MainActivity : ComponentActivity() {
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
         setContent {
             ProjekPbbInfinityTheme {
@@ -47,6 +50,35 @@ class MainActivity : ComponentActivity() {
 
                 var selectedQty by remember { mutableStateOf(1) }
 
+                fun goToLogin() {
+                    auth.signOut()
+                    currentScreen = Screen.LOGIN_FORM
+                }
+
+                fun loginWithEmail(realEmail: String, password: String, fallbackName: String = "User") {
+                    auth.signInWithEmailAndPassword(realEmail.trim(), password)
+                        .addOnSuccessListener { result ->
+                            userName = result.user?.displayName
+                                ?: result.user?.email?.substringBefore("@")
+                                        ?: fallbackName
+
+                            Toast.makeText(
+                                this,
+                                "Login berhasil",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            currentScreen = Screen.BERANDA_USER
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(
+                                this,
+                                "Login gagal. Cek username/email dan password.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                }
+
                 when (currentScreen) {
                     Screen.LANDING -> {
                         LandingScreen(
@@ -58,28 +90,43 @@ class MainActivity : ComponentActivity() {
                     Screen.LOGIN_FORM -> {
                         UserLoginFormScreen(
                             onBackClick = { currentScreen = Screen.LANDING },
-                            onLoginSubmit = { email, password ->
-                                auth.signInWithEmailAndPassword(email, password)
-                                    .addOnSuccessListener { result ->
-                                        userName = result.user?.displayName
-                                            ?: result.user?.email?.substringBefore("@")
-                                                    ?: "User"
+                            onLoginSubmit = { input, password ->
+                                val loginInput = input.trim()
 
-                                        Toast.makeText(
-                                            this,
-                                            "Login berhasil",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                if (loginInput.contains("@")) {
+                                    loginWithEmail(loginInput, password)
+                                } else {
+                                    val usernameKey = loginInput.lowercase()
 
-                                        currentScreen = Screen.BERANDA_USER
-                                    }
-                                    .addOnFailureListener {
-                                        Toast.makeText(
-                                            this,
-                                            "Login gagal. Sign Up dulu atau cek email/password.",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                    }
+                                    db.collection("users")
+                                        .document(usernameKey)
+                                        .get()
+                                        .addOnSuccessListener { document ->
+                                            val realEmail = document.getString("email")
+                                            val savedUsername = document.getString("username") ?: loginInput
+
+                                            if (realEmail.isNullOrBlank()) {
+                                                Toast.makeText(
+                                                    this,
+                                                    "Username tidak ditemukan",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            } else {
+                                                loginWithEmail(
+                                                    realEmail = realEmail,
+                                                    password = password,
+                                                    fallbackName = savedUsername
+                                                )
+                                            }
+                                        }
+                                        .addOnFailureListener { error ->
+                                            Toast.makeText(
+                                                this,
+                                                "Gagal cek username: ${error.message}",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                }
                             }
                         )
                     }
@@ -88,23 +135,45 @@ class MainActivity : ComponentActivity() {
                         UserSignUpFormScreen(
                             onBackClick = { currentScreen = Screen.LANDING },
                             onNextClick = { name, _, email, password ->
-                                auth.createUserWithEmailAndPassword(email, password)
+
+                                val cleanName = name.trim()
+                                val cleanEmail = email.trim()
+                                val usernameKey = cleanName.lowercase()
+
+                                auth.createUserWithEmailAndPassword(cleanEmail, password)
                                     .addOnSuccessListener { result ->
+
+                                        // 🔥 update nama di Firebase Auth
                                         val profileUpdates = userProfileChangeRequest {
-                                            displayName = name
+                                            displayName = cleanName
                                         }
-
                                         result.user?.updateProfile(profileUpdates)
-                                            ?.addOnCompleteListener {
-                                                auth.signOut()
 
+                                        // 🔥 simpan ke Firestore (INI YANG PENTING)
+                                        val userData = hashMapOf(
+                                            "username" to usernameKey,
+                                            "email" to cleanEmail
+                                        )
+
+                                        db.collection("users")
+                                            .document(usernameKey)
+                                            .set(userData)
+                                            .addOnSuccessListener {
                                                 Toast.makeText(
                                                     this,
-                                                    "Sign Up berhasil. Silakan login.",
+                                                    "Sign Up berhasil & tersimpan di database",
                                                     Toast.LENGTH_SHORT
                                                 ).show()
 
+                                                auth.signOut()
                                                 currentScreen = Screen.LOGIN_FORM
+                                            }
+                                            .addOnFailureListener { error ->
+                                                Toast.makeText(
+                                                    this,
+                                                    "Gagal simpan ke database: ${error.message}",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
                                             }
                                     }
                                     .addOnFailureListener { error ->
@@ -125,26 +194,20 @@ class MainActivity : ComponentActivity() {
                                 selectedDetail = it
                                 currentScreen = Screen.DETAIL_PESANAN
                             },
-                            onLogoutClick = {
-                                auth.signOut()
-                                currentScreen = Screen.LOGIN_FORM
-                            }
+                            onLogoutClick = { goToLogin() }
                         )
                     }
 
                     Screen.DETAIL_PESANAN -> {
                         DetailPesananScreen(
                             service = selectedDetail,
-                            onBackClick = { currentScreen = Screen.BERANDA_USER },
                             userName = userName,
+                            onBackClick = { currentScreen = Screen.BERANDA_USER },
                             onContinueClick = { qty ->
                                 selectedQty = qty
                                 currentScreen = Screen.METODE_PEMBAYARAN
                             },
-                            onLogoutClick = {
-                                auth.signOut()
-                                currentScreen = Screen.LOGIN_FORM
-                            }
+                            onLogoutClick = { goToLogin() }
                         )
                     }
 
@@ -153,32 +216,18 @@ class MainActivity : ComponentActivity() {
                             serviceTitle = selectedDetail.title,
                             userName = userName,
                             totalPayment = getHarga(selectedDetail.title) * selectedQty,
-                            onBackClick = {
-                                currentScreen = Screen.DETAIL_PESANAN
-                            },
-                            onQrisPayClick = {
-                                currentScreen = Screen.QRIS_BARCODE
-                            },
-                            onLogoutClick = {
-                                auth.signOut()
-                                currentScreen = Screen.LOGIN_FORM
-                            }
+                            onBackClick = { currentScreen = Screen.DETAIL_PESANAN },
+                            onQrisPayClick = { currentScreen = Screen.QRIS_BARCODE },
+                            onLogoutClick = { goToLogin() }
                         )
                     }
 
                     Screen.QRIS_BARCODE -> {
                         QrisBarcodeScreen(
-                            onBackClick = {
-                                currentScreen = Screen.METODE_PEMBAYARAN
-                            },
                             userName = userName,
-                            onCheckStatusClick = {
-                                currentScreen = Screen.PEMBAYARAN_BERHASIL
-                            },
-                            onLogoutClick = {
-                                auth.signOut()
-                                currentScreen = Screen.LOGIN_FORM
-                            }
+                            onBackClick = { currentScreen = Screen.METODE_PEMBAYARAN },
+                            onCheckStatusClick = { currentScreen = Screen.PEMBAYARAN_BERHASIL },
+                            onLogoutClick = { goToLogin() }
                         )
                     }
 
@@ -187,13 +236,8 @@ class MainActivity : ComponentActivity() {
                             serviceTitle = selectedDetail.title,
                             userName = userName,
                             totalPayment = getHarga(selectedDetail.title) * selectedQty,
-                            onBackClick = {
-                                currentScreen = Screen.QRIS_BARCODE
-                            },
-                            onLogoutClick = {
-                                auth.signOut()
-                                currentScreen = Screen.LOGIN_FORM
-                            }
+                            onBackClick = { currentScreen = Screen.QRIS_BARCODE },
+                            onLogoutClick = { goToLogin() }
                         )
                     }
                 }
