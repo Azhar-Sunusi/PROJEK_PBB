@@ -11,6 +11,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 
+private const val ADMIN_EMAIL = "admin@gmail.com"
+
 enum class Screen {
     LANDING,
     LOGIN_FORM,
@@ -19,7 +21,8 @@ enum class Screen {
     DETAIL_PESANAN,
     METODE_PEMBAYARAN,
     QRIS_BARCODE,
-    PEMBAYARAN_BERHASIL
+    PEMBAYARAN_BERHASIL,
+    ADMIN_HOME
 }
 
 class MainActivity : ComponentActivity() {
@@ -58,17 +61,19 @@ class MainActivity : ComponentActivity() {
                 fun loginWithEmail(realEmail: String, password: String, fallbackName: String = "User") {
                     auth.signInWithEmailAndPassword(realEmail.trim(), password)
                         .addOnSuccessListener { result ->
+                            val emailLogin = result.user?.email ?: ""
+
                             userName = result.user?.displayName
                                 ?: result.user?.email?.substringBefore("@")
                                         ?: fallbackName
 
-                            Toast.makeText(
-                                this,
-                                "Login berhasil",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(this, "Login berhasil", Toast.LENGTH_SHORT).show()
 
-                            currentScreen = Screen.BERANDA_USER
+                            currentScreen = if (emailLogin == ADMIN_EMAIL) {
+                                Screen.ADMIN_HOME
+                            } else {
+                                Screen.BERANDA_USER
+                            }
                         }
                         .addOnFailureListener {
                             Toast.makeText(
@@ -96,10 +101,8 @@ class MainActivity : ComponentActivity() {
                                 if (loginInput.contains("@")) {
                                     loginWithEmail(loginInput, password)
                                 } else {
-                                    val usernameKey = loginInput.lowercase()
-
                                     db.collection("users")
-                                        .document(usernameKey)
+                                        .document(loginInput.lowercase())
                                         .get()
                                         .addOnSuccessListener { document ->
                                             val realEmail = document.getString("email")
@@ -112,11 +115,7 @@ class MainActivity : ComponentActivity() {
                                                     Toast.LENGTH_LONG
                                                 ).show()
                                             } else {
-                                                loginWithEmail(
-                                                    realEmail = realEmail,
-                                                    password = password,
-                                                    fallbackName = savedUsername
-                                                )
+                                                loginWithEmail(realEmail, password, savedUsername)
                                             }
                                         }
                                         .addOnFailureListener { error ->
@@ -135,21 +134,18 @@ class MainActivity : ComponentActivity() {
                         UserSignUpFormScreen(
                             onBackClick = { currentScreen = Screen.LANDING },
                             onNextClick = { name, _, email, password ->
-
                                 val cleanName = name.trim()
                                 val cleanEmail = email.trim()
                                 val usernameKey = cleanName.lowercase()
 
                                 auth.createUserWithEmailAndPassword(cleanEmail, password)
                                     .addOnSuccessListener { result ->
-
-                                        // 🔥 update nama di Firebase Auth
                                         val profileUpdates = userProfileChangeRequest {
                                             displayName = cleanName
                                         }
+
                                         result.user?.updateProfile(profileUpdates)
 
-                                        // 🔥 simpan ke Firestore (INI YANG PENTING)
                                         val userData = hashMapOf(
                                             "username" to usernameKey,
                                             "email" to cleanEmail
@@ -184,6 +180,12 @@ class MainActivity : ComponentActivity() {
                                         ).show()
                                     }
                             }
+                        )
+                    }
+
+                    Screen.ADMIN_HOME -> {
+                        AdminHomeScreen(
+                            onLogoutClick = { goToLogin() }
                         )
                     }
 
