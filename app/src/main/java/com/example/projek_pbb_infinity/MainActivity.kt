@@ -22,7 +22,8 @@ enum class Screen {
     METODE_PEMBAYARAN,
     QRIS_BARCODE,
     PEMBAYARAN_BERHASIL,
-    ADMIN_HOME
+    ADMIN_HOME,
+    ADMIN_PESANAN
 }
 
 class MainActivity : ComponentActivity() {
@@ -58,7 +59,11 @@ class MainActivity : ComponentActivity() {
                     currentScreen = Screen.LOGIN_FORM
                 }
 
-                fun loginWithEmail(realEmail: String, password: String, fallbackName: String = "User") {
+                fun loginWithEmail(
+                    realEmail: String,
+                    password: String,
+                    fallbackName: String = "User"
+                ) {
                     auth.signInWithEmailAndPassword(realEmail.trim(), password)
                         .addOnSuccessListener { result ->
                             val emailLogin = result.user?.email ?: ""
@@ -67,7 +72,11 @@ class MainActivity : ComponentActivity() {
                                 ?: result.user?.email?.substringBefore("@")
                                         ?: fallbackName
 
-                            Toast.makeText(this, "Login berhasil", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this,
+                                "Login berhasil",
+                                Toast.LENGTH_SHORT
+                            ).show()
 
                             currentScreen = if (emailLogin == ADMIN_EMAIL) {
                                 Screen.ADMIN_HOME
@@ -87,26 +96,36 @@ class MainActivity : ComponentActivity() {
                 when (currentScreen) {
                     Screen.LANDING -> {
                         LandingScreen(
-                            onLoginClick = { currentScreen = Screen.LOGIN_FORM },
-                            onSignUpClick = { currentScreen = Screen.SIGN_UP_FORM }
+                            onLoginClick = {
+                                currentScreen = Screen.LOGIN_FORM
+                            },
+                            onSignUpClick = {
+                                currentScreen = Screen.SIGN_UP_FORM
+                            }
                         )
                     }
 
                     Screen.LOGIN_FORM -> {
                         UserLoginFormScreen(
-                            onBackClick = { currentScreen = Screen.LANDING },
+                            onBackClick = {
+                                currentScreen = Screen.LANDING
+                            },
                             onLoginSubmit = { input, password ->
                                 val loginInput = input.trim()
 
                                 if (loginInput.contains("@")) {
-                                    loginWithEmail(loginInput, password)
+                                    loginWithEmail(
+                                        realEmail = loginInput,
+                                        password = password
+                                    )
                                 } else {
                                     db.collection("users")
                                         .document(loginInput.lowercase())
                                         .get()
                                         .addOnSuccessListener { document ->
                                             val realEmail = document.getString("email")
-                                            val savedUsername = document.getString("username") ?: loginInput
+                                            val savedUsername =
+                                                document.getString("username") ?: loginInput
 
                                             if (realEmail.isNullOrBlank()) {
                                                 Toast.makeText(
@@ -115,7 +134,11 @@ class MainActivity : ComponentActivity() {
                                                     Toast.LENGTH_LONG
                                                 ).show()
                                             } else {
-                                                loginWithEmail(realEmail, password, savedUsername)
+                                                loginWithEmail(
+                                                    realEmail = realEmail,
+                                                    password = password,
+                                                    fallbackName = savedUsername
+                                                )
                                             }
                                         }
                                         .addOnFailureListener { error ->
@@ -132,11 +155,22 @@ class MainActivity : ComponentActivity() {
 
                     Screen.SIGN_UP_FORM -> {
                         UserSignUpFormScreen(
-                            onBackClick = { currentScreen = Screen.LANDING },
+                            onBackClick = {
+                                currentScreen = Screen.LANDING
+                            },
                             onNextClick = { name, _, email, password ->
                                 val cleanName = name.trim()
                                 val cleanEmail = email.trim()
                                 val usernameKey = cleanName.lowercase()
+
+                                if (cleanName.isBlank() || cleanEmail.isBlank() || password.isBlank()) {
+                                    Toast.makeText(
+                                        this,
+                                        "Nama, email, dan password wajib diisi",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    return@UserSignUpFormScreen
+                                }
 
                                 auth.createUserWithEmailAndPassword(cleanEmail, password)
                                     .addOnSuccessListener { result ->
@@ -185,7 +219,26 @@ class MainActivity : ComponentActivity() {
 
                     Screen.ADMIN_HOME -> {
                         AdminHomeScreen(
-                            onLogoutClick = { goToLogin() }
+                            onPesananClick = {
+                                currentScreen = Screen.ADMIN_PESANAN
+                            },
+                            onLogoutClick = {
+                                goToLogin()
+                            }
+                        )
+                    }
+
+                    Screen.ADMIN_PESANAN -> {
+                        AdminPesananScreen(
+                            onBackClick = {
+                                currentScreen = Screen.ADMIN_HOME
+                            },
+                            onHomeClick = {
+                                currentScreen = Screen.ADMIN_HOME
+                            },
+                            onLogoutClick = {
+                                goToLogin()
+                            }
                         )
                     }
 
@@ -196,7 +249,9 @@ class MainActivity : ComponentActivity() {
                                 selectedDetail = it
                                 currentScreen = Screen.DETAIL_PESANAN
                             },
-                            onLogoutClick = { goToLogin() }
+                            onLogoutClick = {
+                                goToLogin()
+                            }
                         )
                     }
 
@@ -204,12 +259,16 @@ class MainActivity : ComponentActivity() {
                         DetailPesananScreen(
                             service = selectedDetail,
                             userName = userName,
-                            onBackClick = { currentScreen = Screen.BERANDA_USER },
+                            onBackClick = {
+                                currentScreen = Screen.BERANDA_USER
+                            },
                             onContinueClick = { qty ->
                                 selectedQty = qty
                                 currentScreen = Screen.METODE_PEMBAYARAN
                             },
-                            onLogoutClick = { goToLogin() }
+                            onLogoutClick = {
+                                goToLogin()
+                            }
                         )
                     }
 
@@ -218,18 +277,30 @@ class MainActivity : ComponentActivity() {
                             serviceTitle = selectedDetail.title,
                             userName = userName,
                             totalPayment = getHarga(selectedDetail.title) * selectedQty,
-                            onBackClick = { currentScreen = Screen.DETAIL_PESANAN },
-                            onQrisPayClick = { currentScreen = Screen.QRIS_BARCODE },
-                            onLogoutClick = { goToLogin() }
+                            onBackClick = {
+                                currentScreen = Screen.DETAIL_PESANAN
+                            },
+                            onQrisPayClick = {
+                                currentScreen = Screen.QRIS_BARCODE
+                            },
+                            onLogoutClick = {
+                                goToLogin()
+                            }
                         )
                     }
 
                     Screen.QRIS_BARCODE -> {
                         QrisBarcodeScreen(
                             userName = userName,
-                            onBackClick = { currentScreen = Screen.METODE_PEMBAYARAN },
-                            onCheckStatusClick = { currentScreen = Screen.PEMBAYARAN_BERHASIL },
-                            onLogoutClick = { goToLogin() }
+                            onBackClick = {
+                                currentScreen = Screen.METODE_PEMBAYARAN
+                            },
+                            onCheckStatusClick = {
+                                currentScreen = Screen.PEMBAYARAN_BERHASIL
+                            },
+                            onLogoutClick = {
+                                goToLogin()
+                            }
                         )
                     }
 
@@ -238,8 +309,12 @@ class MainActivity : ComponentActivity() {
                             serviceTitle = selectedDetail.title,
                             userName = userName,
                             totalPayment = getHarga(selectedDetail.title) * selectedQty,
-                            onBackClick = { currentScreen = Screen.QRIS_BARCODE },
-                            onLogoutClick = { goToLogin() }
+                            onBackClick = {
+                                currentScreen = Screen.QRIS_BARCODE
+                            },
+                            onLogoutClick = {
+                                goToLogin()
+                            }
                         )
                     }
                 }

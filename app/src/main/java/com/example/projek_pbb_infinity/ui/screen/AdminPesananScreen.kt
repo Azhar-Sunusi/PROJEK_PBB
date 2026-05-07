@@ -1,32 +1,19 @@
 package com.example.projek_pbb_infinity.ui.screen
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,15 +23,32 @@ import com.example.projek_pbb_infinity.R
 private val Cream = Color(0xFFF3E3D0)
 private val HeaderBlue = Color(0xFF8DB4D1)
 private val LightBlue = Color(0xFFAED3DF)
-private val DarkGray = Color(0xFF8B949C)
 private val TextGray = Color(0xFF707070)
+private val StatusGold = Color(0xFFD39F3E)
+
+data class AdminOrder(
+    val id: String,
+    val date: String,
+    val status: String,
+    val amount: String
+)
 
 @Composable
-fun AdminHomeScreen(
-    onPesananClick: () -> Unit,
-    onLogoutClick: () -> Unit
+fun AdminPesananScreen(
+    onBackClick: () -> Unit,
+    onHomeClick: () -> Unit = onBackClick,
+    onLogoutClick: () -> Unit = {}
 ) {
     var showMenu by remember { mutableStateOf(false) }
+
+    val orders = listOf(
+        AdminOrder("ID# 00001", "11 April 2026", "Berlangsung", "Rp 1.000.000"),
+        AdminOrder("ID# 00002", "11 April 2026", "Berlangsung", "Rp 2.100.000"),
+        AdminOrder("ID# 00003", "11 April 2026", "Berlangsung", "Rp 780.000"),
+        AdminOrder("ID# 00004", "11 April 2026", "Berlangsung", "Rp 760.000"),
+        AdminOrder("ID# 00005", "11 April 2026", "Berlangsung", "Rp 5.000.000"),
+        AdminOrder("ID# 00006", "11 April 2026", "Berlangsung", "Rp 10.000.000")
+    )
 
     Box(
         modifier = Modifier
@@ -54,24 +58,38 @@ fun AdminHomeScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            AdminHeader()
+            AdminPesananHeader()
 
-            SalesSummary()
+            AdminPesananSalesSummary()
 
-            AdminMenuCard(
-                onPesananClick = onPesananClick
-            )
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 17.dp)
+            ) {
+                orders.forEachIndexed { index, order ->
+                    AdminOrderItem(order = order)
+
+                    if (index != orders.lastIndex) {
+                        Spacer(modifier = Modifier.height(14.dp))
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            AdminBottomBar(
+            AdminPesananBottomBar(
+                onBackClick = onBackClick,
+                onHomeClick = onHomeClick,
                 onMenuClick = {
                     showMenu = !showMenu
                 }
             )
         }
 
-        AdminLogoutDropdown(
+        AdminPesananLogoutDropdown(
             showMenu = showMenu,
             onLogoutClick = {
                 showMenu = false
@@ -82,7 +100,7 @@ fun AdminHomeScreen(
 }
 
 @Composable
-private fun AdminHeader() {
+private fun AdminPesananHeader() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -132,7 +150,7 @@ private fun AdminHeader() {
 }
 
 @Composable
-private fun SalesSummary() {
+private fun AdminPesananSalesSummary() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -161,7 +179,7 @@ private fun SalesSummary() {
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
-            text = "Rp  0",
+            text = "Rp  54.340.000",
             color = TextGray,
             fontSize = 18.sp
         )
@@ -169,133 +187,62 @@ private fun SalesSummary() {
 }
 
 @Composable
-private fun AdminMenuCard(
-    onPesananClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .height(430.dp)
-            .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 16.dp)
-    ) {
-        Text(
-            text = "Hai, Admin 👋",
-            color = TextGray,
-            fontSize = 14.sp
-        )
-
-        Text(
-            text = "Kelola bisnis percetakanmu dengan lebih mudah",
-            color = TextGray,
-            fontSize = 14.sp
-        )
-
-        Text(
-            text = "dan cepat",
-            color = TextGray,
-            fontSize = 14.sp
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            AdminMenuItem(
-                iconText = "📋",
-                label = "Pesanan",
-                onClick = onPesananClick
-            )
-
-            AdminMenuItem(
-                iconText = "🖨️",
-                label = "Produk",
-                onClick = { }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(18.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            AdminMenuItem(
-                iconText = "👔",
-                label = "Pegawai",
-                onClick = { }
-            )
-
-            AdminMenuItem(
-                iconText = "⚙️",
-                label = "Pengaturan",
-                onClick = { }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(54.dp)
-                .background(DarkGray, RoundedCornerShape(10.dp))
-                .clickable {
-                    // nanti bisa diarahkan ke halaman riwayat transaksi admin
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Riwayat Transaksi",
-                color = Color.White,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-@Composable
-private fun AdminMenuItem(
-    iconText: String,
-    label: String,
-    onClick: () -> Unit
+private fun AdminOrderItem(
+    order: AdminOrder
 ) {
     Box(
         modifier = Modifier
-            .size(94.dp)
-            .border(
-                width = 4.dp,
-                color = LightBlue,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
+            .fillMaxWidth()
+            .height(60.dp)
+            .background(Color.White, RoundedCornerShape(10.dp))
+            .padding(horizontal = 12.dp)
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.align(Alignment.CenterStart)
         ) {
             Text(
-                text = iconText,
-                fontSize = 32.sp
+                text = order.id,
+                color = TextGray,
+                fontSize = 13.sp
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             Text(
-                text = label,
-                color = Color.Black,
-                fontSize = 14.sp
+                text = order.date,
+                color = TextGray,
+                fontSize = 11.sp
             )
         }
+
+        Box(
+            modifier = Modifier
+                .width(118.dp)
+                .height(22.dp)
+                .align(Alignment.Center)
+                .background(StatusGold, RoundedCornerShape(12.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = order.status,
+                color = Color.White,
+                fontSize = 12.sp
+            )
+        }
+
+        Text(
+            text = order.amount,
+            color = TextGray,
+            fontSize = 13.sp,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        )
     }
 }
 
 @Composable
-private fun AdminBottomBar(
+private fun AdminPesananBottomBar(
+    onBackClick: () -> Unit,
+    onHomeClick: () -> Unit,
     onMenuClick: () -> Unit
 ) {
     Box(
@@ -307,8 +254,35 @@ private fun AdminBottomBar(
         Box(
             modifier = Modifier
                 .size(56.dp)
+                .align(Alignment.CenterStart)
+                .offset(x = 6.dp)
+                .background(Color(0xFFB8DAE5), CircleShape)
+                .clickable { onBackClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            Canvas(
+                modifier = Modifier.size(34.dp)
+            ) {
+                val path = Path().apply {
+                    moveTo(size.width * 0.18f, size.height * 0.50f)
+                    lineTo(size.width * 0.78f, size.height * 0.16f)
+                    lineTo(size.width * 0.78f, size.height * 0.84f)
+                    close()
+                }
+
+                drawPath(
+                    path = path,
+                    color = Color.Black
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .size(56.dp)
                 .align(Alignment.Center)
-                .background(Color(0xFFB8DAE5), CircleShape),
+                .background(Color(0xFFB8DAE5), CircleShape)
+                .clickable { onHomeClick() },
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -322,11 +296,9 @@ private fun AdminBottomBar(
             modifier = Modifier
                 .size(52.dp)
                 .align(Alignment.CenterEnd)
-                .offset(x = (-12).dp)
+                .offset(x = (-14).dp)
                 .background(Color(0xFFB8DAE5), RoundedCornerShape(8.dp))
-                .clickable {
-                    onMenuClick()
-                },
+                .clickable { onMenuClick() },
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -339,7 +311,7 @@ private fun AdminBottomBar(
 }
 
 @Composable
-private fun AdminLogoutDropdown(
+private fun AdminPesananLogoutDropdown(
     showMenu: Boolean,
     onLogoutClick: () -> Unit
 ) {
@@ -355,9 +327,7 @@ private fun AdminLogoutDropdown(
                     .width(210.dp)
                     .height(86.dp)
                     .background(Color.White, RoundedCornerShape(28.dp))
-                    .clickable {
-                        onLogoutClick()
-                    }
+                    .clickable { onLogoutClick() }
                     .padding(horizontal = 24.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
