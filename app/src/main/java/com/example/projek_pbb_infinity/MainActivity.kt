@@ -21,6 +21,7 @@ enum class Screen {
     DETAIL_PESANAN,
     METODE_PEMBAYARAN,
     QRIS_BARCODE,
+    PEMBAYARAN_DIPROSES,
     PEMBAYARAN_BERHASIL,
     ADMIN_HOME,
     ADMIN_PESANAN
@@ -296,6 +297,26 @@ class MainActivity : ComponentActivity() {
                                 currentScreen = Screen.METODE_PEMBAYARAN
                             },
                             onCheckStatusClick = {
+                                currentScreen = Screen.PEMBAYARAN_DIPROSES
+                            },
+                            onLogoutClick = {
+                                goToLogin()
+                            }
+                        )
+                    }
+
+                    Screen.PEMBAYARAN_DIPROSES -> {
+                        PembayaranDiprosesScreen(
+                            serviceTitle = selectedDetail.title,
+                            userName = userName,
+                            totalPayment = getHarga(selectedDetail.title) * selectedQty,
+                            onBackClick = {
+                                currentScreen = Screen.QRIS_BARCODE
+                            },
+                            onHomeClick = {
+                                currentScreen = Screen.BERANDA_USER
+                            },
+                            onSelesaiClick = {
                                 currentScreen = Screen.PEMBAYARAN_BERHASIL
                             },
                             onLogoutClick = {
@@ -310,7 +331,7 @@ class MainActivity : ComponentActivity() {
                             userName = userName,
                             totalPayment = getHarga(selectedDetail.title) * selectedQty,
                             onBackClick = {
-                                currentScreen = Screen.QRIS_BARCODE
+                                currentScreen = Screen.PEMBAYARAN_DIPROSES
                             },
                             onLogoutClick = {
                                 goToLogin()
