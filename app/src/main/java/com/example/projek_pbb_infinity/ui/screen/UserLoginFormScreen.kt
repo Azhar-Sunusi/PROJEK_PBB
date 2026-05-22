@@ -75,7 +75,7 @@ fun UserLoginFormScreen(
                     modifier = Modifier
                         .size(100.dp)
                         .align(Alignment.TopStart)
-                        .offset(x = (-8).dp, y = (-58).dp),
+                        .offset(x = (-8).dp, y = (-62).dp),
                     contentScale = ContentScale.Fit
                 )
 
