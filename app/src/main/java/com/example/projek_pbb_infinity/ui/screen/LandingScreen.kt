@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,87 +24,131 @@ fun LandingScreen(
     onLoginClick: () -> Unit,
     onSignUpClick: () -> Unit
 ) {
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF3E3D0))
     ) {
+
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Spacer(modifier = Modifier.height(72.dp))
+            Spacer(modifier = Modifier.height(80.dp))
 
             // TITLE
             Text(
                 text = "INKFINITY",
-                fontSize = 28.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF4A4A4A)
             )
 
-            Spacer(modifier = Modifier.height(44.dp))
+            Spacer(modifier = Modifier.height(36.dp))
 
-            // CIRCLE + LOGO
+            // LOGO UTAMA
             Box(
-                modifier = Modifier
-                    .size(220.dp)
-                    .background(
-                        color = Color(0xFFD5BFA6),
-                        shape = CircleShape
-                    ),
+                modifier = Modifier.size(260.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo_kucing4),
-                    contentDescription = "Logo",
+
+                // BULATAN
+                Box(
                     modifier = Modifier
-                        .fillMaxSize(0.7f)
-                        .offset(x = (2).dp, y = (0).dp),
-                    contentScale = ContentScale.Fit
+                        .size(230.dp)
+                        .background(
+                            color = Color(0xFFD5BFA6),
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_kucing4),
+                        contentDescription = "Logo",
+                        modifier = Modifier.fillMaxSize(0.72f),
+                        contentScale = ContentScale.Fit
+                    )
+                }
+
+                // KUCING KANAN (BESAR)
+                Image(
+                    painter = painterResource(R.drawable.kucing_1),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(110.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(x = (-30).dp, y = 42.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(70.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            // LOGIN BUTTON
+            // LOGIN
             Button(
                 onClick = onLoginClick,
                 modifier = Modifier
-                    .width(140.dp)
-                    .height(42.dp),
-                shape = RoundedCornerShape(10.dp),
+                    .width(165.dp)
+                    .height(52.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF8EB0CF),
                     contentColor = Color.White
                 )
             ) {
+
                 Text(
                     text = "Log In",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontSize = 16.sp
                 )
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // SIGN UP BUTTON
+            // SIGN UP
             Button(
                 onClick = onSignUpClick,
                 modifier = Modifier
-                    .width(140.dp)
-                    .height(42.dp),
-                shape = RoundedCornerShape(10.dp),
+                    .width(165.dp)
+                    .height(52.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF8EB0CF),
                     contentColor = Color.White
                 )
             ) {
+
                 Text(
                     text = "Sign Up",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontSize = 16.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(36.dp))
+
+            // 2 KUCING BAWAH
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 45.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                // KUCING KIRI
+                Image(
+                    painter = painterResource(R.drawable.kucing_2),
+                    contentDescription = null,
+                    modifier = Modifier.size(120.dp)
+                )
+
+                // KUCING KANAN
+                Image(
+                    painter = painterResource(R.drawable.kucing_3),
+                    contentDescription = null,
+                    modifier = Modifier.size(120.dp)
                 )
             }
         }
